@@ -1,9 +1,3 @@
-# Ignore file for Visual Studio
-
-# use glob syntax
-syntax: glob
-
-# Ignore Visual Studio files
 *.obj
 *.exe
 *.pdb
