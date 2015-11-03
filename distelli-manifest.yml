@@ -1,2 +1,59 @@
 bmcgehee/blogengine:
 
+  Env:
+    # Define the TCP port you want the IIS application to listen on
+    - PORT: 8085
+    # Define the Name for the IIS application
+    - SITE: blog2
+    # Define the Directory full path where the IIS application should reside
+    - APPDIR: c:\blog2
+
+  Build:
+    - cd BlogEngine
+    - '"c:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe" BlogEngine.sln /TargetFrameworkversoin=v4.5 /verbosity:diag'
+
+  PkgInclude:
+    - BlogEngine\BlogEngine.Net\*
+
+  PreInstall:
+    - echo "Begin PreInstall"
+    # Unremark the following to install IIS, ASP, and dotNET
+    #- echo "Installing IIS"
+    #- dism /enable-feature /online /featurename:IIS-WebServer /all
+    #- dism /enable-feature /online /featureName:IIS-ASP /all
+    #- dism /enable-feature /online /featureName:IIS-ASPNET /all
+    #- dism /enable-feature /online /featureName:IIS-ASPNET45 /all
+    #- echo "Done Installing IIS"
+    - echo/%%SITE%%=%SITE%
+    - for /F "tokens=*" %%a in ('%windir%\system32\inetsrv\appcmd list site %SITE%') do set RESPONSE=%%a
+    - echo/%%RESPONSE%%=%RESPONSE% 
+    - if "%RESPONSE%"=="" (
+    -   echo "%SITE% doesn't exist"
+    - ) else (
+    -   echo "%SITE% does exist. Deleting"
+    -   (%windir%\system32\inetsrv\appcmd delete site %SITE%)
+    - )
+    - echo "end IF"
+    - rmdir /S/Q %APPDIR%
+    - mkdir %APPDIR%
+    - (%windir%\system32\inetsrv\appcmd add site /name:%SITE% /physicalPath:%APPDIR% /bindings:http://*:%PORT%)
+    - echo "Done PreInstall"
+
+  PostInstall:
+    - echo "Begin PostInstall"
+    #- 7za x *.zip -o%APPDIR%\
+    - xcopy BlogEngine\BlogEngine.Net\* %APPDIR%\ /E
+    - attrib -r %APPDIR%\App_Data /s /d
+    - icacls "%APPDIR%\App_Data" /grant IIS_IUSRS:(OI)(CI)F /t
+    - icacls "%APPDIR%\App_Data" /grant IUSR:(OI)(CI)F /t
+    - echo "Done PostInstall"
+
+  Start:
+    - echo "Begin Start"
+    - (%windir%\system32\inetsrv\appcmd start site %SITE%)
+    - echo "Opening Firewall for Port %PORT%"
+    - netsh advfirewall firewall add rule name="TCP Port %PORT%" dir=in action=allow protocol=TCP localport=%PORT%
+    - netsh advfirewall firewall delete rule name="TCP Port %PORT%"
+    - netsh advfirewall firewall add rule name="TCP Port %PORT%" dir=in action=allow protocol=TCP localport=%PORT%
+    - netsh advfirewall firewall add rule name="TCP Port %PORT%" dir=out action=allow protocol=TCP localport=%PORT%
+    - echo "Done Start"
