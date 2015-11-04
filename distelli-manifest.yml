@@ -13,7 +13,8 @@ bmcgehee/blogengine:
     - '"c:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe" BlogEngine.sln /property:Configuration=Release;TargetFrameworkVersion=v4.5'
 
   PkgInclude:
-    - BlogEngine\BlogEngine.NET\*
+    - BlogEngine\BlogEngine.NET\
+    
 
   PreInstall:
     - echo "Begin PreInstall"
