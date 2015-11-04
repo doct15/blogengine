@@ -10,10 +10,10 @@ bmcgehee/blogengine:
 
   Build:
     - cd BlogEngine
-    - '"c:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe" BlogEngine.sln /property:AdditionalLibPaths="c:\Users\Administrator\blogengine\BlogEngine\packages;Configuration=Release;TargetFrameworkVersion=v4.5'
+    - '"c:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe" BlogEngine.sln /property:Configuration=Release;TargetFrameworkVersion=v4.5'
 
   PkgInclude:
-    - BlogEngine\BlogEngine.Net\*
+    - BlogEngine\BlogEngine.NET\*
 
   PreInstall:
     - echo "Begin PreInstall"
